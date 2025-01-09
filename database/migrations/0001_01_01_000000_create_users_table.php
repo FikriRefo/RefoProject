@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB; // Add this line to import the DB facade
 
 return new class extends Migration
 {
@@ -17,6 +18,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['Admin', 'User']); // Added role field
+            $table->timestamp('last_login')->nullable(); // Added last_login field
             $table->rememberToken();
             $table->timestamps();
         });
@@ -35,6 +38,17 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        // Insert default user
+        DB::table('users')->insert([
+            'name' => 'administrator',
+            'email' => 'admin@mail.com',
+            'password' => bcrypt('admin123'), // Make sure to hash the password
+            'role' => 'Admin',
+            'last_login' => now(), // Set last login to current time
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**
